@@ -1,7 +1,10 @@
 <template>
 <div>
-  <h1>Home</h1>
+  <h1>vue-port-graph</h1>
+  <h3>Graph</h3>
   <PortGraph :graphConfig="graphConfig" />
+  <h3>Config</h3>
+  <pre>{{ JSON.stringify(graphConfig, null, 2).trim() }}</pre>
 </div>
 </template>
 
@@ -37,3 +40,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+pre {
+  text-align: left;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2em;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  background-color: #f1f1f1;
+}
+</style>
