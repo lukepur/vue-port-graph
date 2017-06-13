@@ -14,7 +14,7 @@ export default {
     return {
       graphConfig: {
         nodes: [
-          { id: 'input_node', ports: [ { id: 'input_one', type: 'output' }, { id: 'input_two', type: 'output' } ] },
+          { id: 'input_node', ports: [ { id: 'input_one', type: 'output' }, { id: 'input_two', type: 'output' }, { id: 'input_three', type: 'output' } ] },
           { id: 'subprocess_one', ports: [ { id: 'arg_one', type: 'input' }, { id: 'arg_two', type: 'input' }, { id: 'output', type: 'output' } ] },
           { id: 'subprocess_two', ports: [ { id: 'arg_one', type: 'input' }, { id: 'output', type: 'output' } ] }
         ],
@@ -22,7 +22,13 @@ export default {
           { source: { nodeId: 'input_node', portId: 'input_one' }, target: { nodeId: 'subprocess_one', portId: 'arg_one' } },
           { source: { nodeId: 'input_node', portId: 'input_two' }, target: { nodeId: 'subprocess_two', portId: 'arg_one' } },
           { source: { nodeId: 'subprocess_two', portId: 'output' }, target: { nodeId: 'subprocess_one', portId: 'arg_two' } }
-        ]
+        ],
+        options: {
+          nodeWidth: 200,
+          nodeHeight: 40,
+          portRadius: 10,
+          graphPadding: 20
+        }
       }
     };
   },
