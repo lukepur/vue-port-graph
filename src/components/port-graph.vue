@@ -12,13 +12,19 @@
 
 <script>
 import dagre from 'dagre';
-import { find, last } from 'lodash';
+import { find, last, merge } from 'lodash';
 
 import Node from './node.vue';
 import Edge from './edge.vue';
 import Port from './port.vue';
 
 const DUMMY_PREFIX = 'dummy_';
+const DEFAULT_OPTS = {
+  nodeWidth: 200,
+  nodeHeight: 40,
+  portRadius: 10,
+  graphPadding: 20
+};
 
 export default {
   name: 'PortGraph',
@@ -29,8 +35,13 @@ export default {
     }
   },
   computed: {
+    graphOptions () {
+      let { options } = this.graphConfig;
+      return merge({}, DEFAULT_OPTS, options);
+    },
     layout () {
-      const { nodes, edges, options } = this.graphConfig;
+      let { nodes, edges } = this.graphConfig;
+      const options = this.graphOptions;
 
       // init dagre graph
       const graph = new dagre.graphlib.Graph();
@@ -47,7 +58,7 @@ export default {
         node.ports.forEach(port => {
           if (!this.isPortConnected(port, node.id, edges)) {
             const dummyId = `${DUMMY_PREFIX}${dummySeq++}`;
-            graph.setNode(dummyId, { width: options.nodeWidth / 2, height: 0 });
+            graph.setNode(dummyId, { width: options.portRadius * 2, height: 0 });
             graph.setEdge(node.id, dummyId);
           }
         });
@@ -109,14 +120,11 @@ export default {
     },
 
     padding () {
-      const { graphPadding } = this.graphConfig.options;
-      return graphPadding !== undefined ? graphPadding : 20;
+      return this.graphOptions.graphPadding;
     },
 
     portRadius () {
-      let { portRadius } = this.graphConfig.options;
-      if (portRadius === undefined) portRadius = 5;
-      return portRadius;
+      return this.graphOptions.portRadius;
     }
   },
   methods: {
