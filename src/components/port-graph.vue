@@ -24,7 +24,9 @@ const DEFAULT_OPTS = {
   nodeHeight: 40,
   portRadius: 10,
   graphPadding: 20,
-  dagre: {}
+  dagre: {
+    nodesep: 2 * 10
+  }
 };
 
 export default {
@@ -46,7 +48,7 @@ export default {
 
       // init dagre graph
       const graph = new dagre.graphlib.Graph();
-      graph.setGraph({});
+      graph.setGraph(options.dagre);
       graph.setDefaultEdgeLabel(() => ({}));
 
       let dummySeq = 0;
@@ -59,8 +61,12 @@ export default {
         node.ports.forEach(port => {
           if (!this.isPortConnected(port, node.id, edges)) {
             const dummyId = `${DUMMY_PREFIX}${dummySeq++}`;
-            graph.setNode(dummyId, { width: options.portRadius * 2, height: 0 });
-            graph.setEdge(node.id, dummyId);
+            graph.setNode(dummyId, { width: options.portRadius * 4, height: 0 });
+            if (port.type === 'input') {
+              graph.setEdge(dummyId, node.id);
+            } else {
+              graph.setEdge(node.id, dummyId);
+            }
           }
         });
       });
@@ -71,7 +77,7 @@ export default {
       });
 
       // run layout
-      dagre.layout(graph, options.dagre);
+      dagre.layout(graph);
 
       return graph;
     },
@@ -154,6 +160,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>
