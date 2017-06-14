@@ -1,7 +1,7 @@
 {
   "name": "vue-port-graph",
   "description": "Graph a layout of nodes with ports",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "author": {
     "name": "Luke Purton",
     "email": "luke.purton@gmail.com"
@@ -12,15 +12,12 @@
     "plugin"
   ],
   "license": "MIT",
-  "main": "dist/vue-port-graph.common.js",
-  "unpkg": "dist/vue-port-graph.browser.js",
-  "module": "index.js",
+  "main": "src/components/port-graph.vue",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --config config/webpack.config.dev.js --progress --watch",
     "build": "npm run build:browser && npm run build:common",
     "build:browser": "cross-env NODE_ENV=production webpack --config config/webpack.config.browser.js --progress --hide-modules",
-    "build:common": "cross-env NODE_ENV=production webpack --config config/webpack.config.common.js --progress --hide-modules",
-    "prepublish": "npm run build"
+    "build:common": "cross-env NODE_ENV=production webpack --config config/webpack.config.common.js --progress --hide-modules"
   },
   "repository": {
     "type": "git",
