@@ -23,7 +23,8 @@ const DEFAULT_OPTS = {
   nodeWidth: 200,
   nodeHeight: 40,
   portRadius: 10,
-  graphPadding: 20
+  graphPadding: 20,
+  dagre: {}
 };
 
 export default {
@@ -70,7 +71,7 @@ export default {
       });
 
       // run layout
-      dagre.layout(graph);
+      dagre.layout(graph, options.dagre);
 
       return graph;
     },
