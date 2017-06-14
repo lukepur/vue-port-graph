@@ -1,7 +1,7 @@
 {
   "name": "vue-port-graph",
   "description": "Graph a layout of nodes with ports",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": {
     "name": "Luke Purton",
     "email": "luke.purton@gmail.com"
@@ -31,8 +31,7 @@
     "babel-core": "^6.0.0",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^6.0.0",
-    "babel-preset-es2015": "^6.14.0",
-    "babel-preset-stage-0": "^6.16.0",
+    "babel-preset-stage-2": "^6.24.1",
     "cross-env": "^3.1.3",
     "css-loader": "^0.26.1",
     "eslint": "^3.12.1",
