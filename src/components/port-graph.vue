@@ -4,6 +4,7 @@
       <g :transform="`translate(${padding}, ${padding})`">
         <Node v-for="(node, index) in nodes" :node="node" :key="index" />
         <Edge v-for="(edge, index) in edges" :edge="edge" :key="index" />
+        <path :d="dragPathAsSvg" class="drag-path" />
         <Port v-for="(port, index) in ports"
               :port="port"
               :radius="portRadius"
@@ -11,8 +12,8 @@
               :onPortDragStart="handlePortDragStart"
               :onPortDrag="handlePortDrag"
               :onPortDragEnd="handlePortDragEnd"
+              :onPortDropTarget="handleDropTarget"
               :onConnection="onConnection" />
-        <path :d="dragPathAsSvg" class="drag-path" />
       </g>
     </svg>
   </div>
@@ -42,7 +43,7 @@ export default {
 
   data () {
     return {
-      isPortDrag: false,
+      portBeingDragged: null,
       dragCandidates: [],
       dragPath: emptyDragPath()
     };
@@ -165,7 +166,7 @@ export default {
     },
 
     portDraggingClass () {
-      return this.isPortDrag ? 'port-dragging' : '';
+      return this.portBeingDragged ? 'port-dragging' : '';
     },
 
     dragPathAsSvg () {
@@ -208,7 +209,7 @@ export default {
     },
 
     handlePortDragStart (port) {
-      this.isPortDrag = true;
+      this.portBeingDragged = { ...port };
       this.dragCandidates = this.ports.filter(p => p.type !== port.type && p.nodeId !== port.nodeId);
       this.dragPath = {
         start: {...port.point}
@@ -223,9 +224,14 @@ export default {
     },
 
     handlePortDragEnd (port) {
-      this.isPortDrag = false;
+      this.portBeingDragged = null;
       this.dragCandidates = [];
       this.dragPath = emptyDragPath();
+    },
+
+    handleDropTarget (port) {
+      console.log('port', this.portBeingDragged);
+      console.log('dragged to', port);
     }
   },
   components: {

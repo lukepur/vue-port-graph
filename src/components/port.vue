@@ -5,7 +5,7 @@
           class="port"
           :class="`${dragClass} ${dragCandidateClass} ${dragTargetClass}`"
           @mouseenter="handlemouseenter"
-          @mouseleave="handlemouseleave" >
+          @mouseleave="handlemouseleave" />
   </circle>
 </template>
 
@@ -41,6 +41,10 @@ export default {
       type: Function,
       default: () => {}
     },
+    onPortDropTarget: {
+      type: Function,
+      default: () => {}
+    },
     onConnection: {
       type: Function,
       default: () => {}
@@ -62,13 +66,24 @@ export default {
   },
 
   methods: {
+    onmouseup () {
+      console.log('mouseup');
+      if (this.mouseover && this.port.isCandidate) {
+        this.onPortDropTarget(this.port);
+      }
+    },
+
     handlemouseenter () {
+      console.log('adding listener');
+      window.addEventListener('mouseup', this.onmouseup, true);
       this.mouseover = true;
     },
 
     handlemouseleave () {
       this.mouseover = false;
-    }
+      console.log('removing listener');
+      window.removeEventListener('mouseup', this.onmouseup);
+    },
   },
 
   mounted () {
@@ -85,7 +100,8 @@ export default {
         this.onPortDragEnd(this.port);
         this.dragging = false;
       });
-    select(this.$el).call(dragBehaviour);
+    select(this.$el)
+      .call(dragBehaviour);
   }
 }
 </script>
@@ -95,7 +111,6 @@ export default {
   fill: #fff;
   stroke: #7a93a9;
   stroke-width: 3;
-  cursor: move;
 }
 
 .dragging {
