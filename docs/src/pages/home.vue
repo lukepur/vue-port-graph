@@ -2,7 +2,7 @@
 <div>
   <h1>vue-port-graph</h1>
   <h3>Graph</h3>
-  <PortGraph :graphConfig="graphConfig" />
+  <PortGraph :graphConfig="graphConfig" :onConnection="handleConnection" />
   <h3>Config</h3>
   <pre>{{ JSON.stringify(graphConfig, null, 2).trim() }}</pre>
 </div>
@@ -32,6 +32,9 @@ export default {
           portRadius: 10,
           graphPadding: 20
         }
+      },
+      handleConnection: (con) => {
+        console.log('connection received:', con);
       }
     };
   },

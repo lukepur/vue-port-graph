@@ -1,10 +1,10 @@
 <template>
-  <div class="">
+  <div class="graph">
     <svg :width="layout.graph().width + (2 * padding)" :height="layout.graph().height + (2 * padding)">
       <g :transform="`translate(${padding}, ${padding})`">
         <Node v-for="(node, index) in nodes" :node="node" :key="index" />
         <Edge v-for="(edge, index) in edges" :edge="edge" :key="index" />
-        <Port v-for="(port, index) in ports" :port="port" :radius="portRadius" :key="index" />
+        <Port v-for="(port, index) in ports" :port="port" :radius="portRadius" :key="index" :onConnection="onConnection" />
       </g>
     </svg>
   </div>
@@ -31,12 +31,18 @@ const DEFAULT_OPTS = {
 
 export default {
   name: 'PortGraph',
+
   props: {
     graphConfig: {
       type: Object,
       default: () => ({ nodes: [], edges: [], options: {} })
+    },
+    onConnection: {
+      type: Function,
+      default: () => {}
     }
   },
+
   computed: {
     graphOptions () {
       let { options } = this.graphConfig;
@@ -63,9 +69,9 @@ export default {
             const dummyId = `${DUMMY_PREFIX}${dummySeq++}`;
             graph.setNode(dummyId, { width: options.portRadius * 4, height: 0 });
             if (port.type === 'input') {
-              graph.setEdge(dummyId, node.id);
+              graph.setEdge(dummyId, node.id, { from: {}, to: {nodeId: node.id, portId: port.id }});
             } else {
-              graph.setEdge(node.id, dummyId);
+              graph.setEdge(node.id, dummyId, { from: { nodeId: node.id, portId: port.id }, to: {}});
             }
           }
         });
@@ -73,7 +79,10 @@ export default {
 
       // add dagre edges
       edges.forEach(edge => {
-        graph.setEdge(edge.source.nodeId, edge.target.nodeId);
+        graph.setEdge(edge.source.nodeId, edge.target.nodeId, {
+          from: { ...edge.source },
+          to: { ...edge.target }
+        });
       });
 
       // run layout
@@ -109,15 +118,18 @@ export default {
     ports () {
       const ports = [];
       this.layout.edges().forEach(edge => {
+        const e = this.layout.edge(edge);
         const { v, w } = edge;
         if (!this.isDummyLabel(v)) {
           ports.push({
+            ...e.from,
             point: this.layout.edge(edge).points[0],
             type: 'source'
           });
         }
         if (!this.isDummyLabel(w)) {
           ports.push({
+            ...e.to,
             point: last(this.layout.edge(edge).points),
             type: 'target'
           });
@@ -160,3 +172,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.graph {
+  user-select: none;
+}
+</style>
