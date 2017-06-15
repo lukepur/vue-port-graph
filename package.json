@@ -48,6 +48,7 @@
     "webpack-merge": "^1.1.2"
   },
   "dependencies": {
+    "d3-drag": "^1.1.0",
     "dagre": "^0.7.4",
     "lodash": "^4.17.4",
     "vue": "^2.3.4"

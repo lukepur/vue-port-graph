@@ -1,10 +1,18 @@
 <template>
-  <div class="graph">
+  <div class="graph" :class="`${portDraggingClass}`">
     <svg :width="layout.graph().width + (2 * padding)" :height="layout.graph().height + (2 * padding)">
       <g :transform="`translate(${padding}, ${padding})`">
         <Node v-for="(node, index) in nodes" :node="node" :key="index" />
         <Edge v-for="(edge, index) in edges" :edge="edge" :key="index" />
-        <Port v-for="(port, index) in ports" :port="port" :radius="portRadius" :key="index" :onConnection="onConnection" />
+        <Port v-for="(port, index) in ports"
+              :port="port"
+              :radius="portRadius"
+              :key="index"
+              :onPortDragStart="handlePortDragStart"
+              :onPortDrag="handlePortDrag"
+              :onPortDragEnd="handlePortDragEnd"
+              :onConnection="onConnection" />
+        <path :d="dragPathAsSvg" class="drag-path" />
       </g>
     </svg>
   </div>
@@ -31,6 +39,14 @@ const DEFAULT_OPTS = {
 
 export default {
   name: 'PortGraph',
+
+  data () {
+    return {
+      isPortDrag: false,
+      dragCandidates: [],
+      dragPath: emptyDragPath()
+    };
+  },
 
   props: {
     graphConfig: {
@@ -123,6 +139,7 @@ export default {
         if (!this.isDummyLabel(v)) {
           ports.push({
             ...e.from,
+            isCandidate: this.isCandidate(e.from),
             point: this.layout.edge(edge).points[0],
             type: 'source'
           });
@@ -130,6 +147,7 @@ export default {
         if (!this.isDummyLabel(w)) {
           ports.push({
             ...e.to,
+            isCandidate: this.isCandidate(e.to),
             point: last(this.layout.edge(edge).points),
             type: 'target'
           });
@@ -144,8 +162,25 @@ export default {
 
     portRadius () {
       return this.graphOptions.portRadius;
+    },
+
+    portDraggingClass () {
+      return this.isPortDrag ? 'port-dragging' : '';
+    },
+
+    dragPathAsSvg () {
+      if (this.dragPath.start.x === null) return '';
+      const { start, end } = this.dragPath;
+      let path = `M${start.x} ${start.y}`;
+
+      if (end) {
+        path += ` L${end.x} ${end.y}`;
+      }
+
+      return path;
     }
   },
+
   methods: {
     isPortConnected (port, nodeId, edges) {
       return find(edges, edge => {
@@ -153,16 +188,44 @@ export default {
         return edge[typeProp].nodeId === nodeId && edge[typeProp].portId === port.id;
       }) !== undefined;
     },
+
     isDummyLabel (label) {
       return label && label.indexOf && label.indexOf('dummy_') > -1;
     },
+
+    isCandidate (port) {
+      return find(this.dragCandidates, { nodeId: port.nodeId, portId: port.portId }) !== undefined;
+    },
+
     nodeX (n) {
       const { x } = this.layout.node(n);
       return x - (this.layout.node(n).width / 2);
     },
+
     nodeY (n) {
       const { y } = this.layout.node(n);
       return y - (this.layout.node(n).height / 2);
+    },
+
+    handlePortDragStart (port) {
+      this.isPortDrag = true;
+      this.dragCandidates = this.ports.filter(p => p.type !== port.type && p.nodeId !== port.nodeId);
+      this.dragPath = {
+        start: {...port.point}
+      };
+    },
+
+    handlePortDrag (port, evt) {
+      this.dragPath = { 
+        ...this.dragPath,
+        end: { x: evt.x, y: evt.y }
+      };
+    },
+
+    handlePortDragEnd (port) {
+      this.isPortDrag = false;
+      this.dragCandidates = [];
+      this.dragPath = emptyDragPath();
     }
   },
   components: {
@@ -171,10 +234,22 @@ export default {
     Port
   }
 }
+
+function emptyDragPath () {
+  return {
+    start: { x: null, y: null },
+    end: { x: null, y: null }
+  };
+}
 </script>
 
 <style scoped>
 .graph {
   user-select: none;
+}
+
+.drag-path {
+  stroke: #1c6fb9;
+  stroke-width: 3;
 }
 </style>

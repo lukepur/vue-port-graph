@@ -31,4 +31,8 @@ export default {
   stroke-width: 3;
   fill: none;
 }
+
+.port-dragging .edge {
+  stroke: #d3d3d3;
+}
 </style>
