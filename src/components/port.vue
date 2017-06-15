@@ -4,6 +4,7 @@
           :r="radius"
           class="port"
           :class="`${dragClass} ${dragCandidateClass} ${dragTargetClass}`"
+          @mouseup="onmouseup"
           @mouseenter="handlemouseenter"
           @mouseleave="handlemouseleave" />
   </circle>
@@ -67,7 +68,7 @@ export default {
 
   methods: {
     onmouseup () {
-      console.log('mouseup');
+      console.log('mouseup', this);
       if (this.mouseover && this.port.isCandidate) {
         this.onPortDropTarget(this.port);
       }
@@ -75,14 +76,14 @@ export default {
 
     handlemouseenter () {
       console.log('adding listener');
-      window.addEventListener('mouseup', this.onmouseup, true);
+      // window.addEventListener('mouseup', this.onmouseup, true);
       this.mouseover = true;
     },
 
     handlemouseleave () {
       this.mouseover = false;
       console.log('removing listener');
-      window.removeEventListener('mouseup', this.onmouseup);
+      // window.removeEventListener('mouseup', this.onmouseup, true);
     },
   },
 
@@ -100,8 +101,8 @@ export default {
         this.onPortDragEnd(this.port);
         this.dragging = false;
       });
-    select(this.$el)
-      .call(dragBehaviour);
+    // select(this.$el)
+    //   .call(dragBehaviour);
   }
 }
 </script>
