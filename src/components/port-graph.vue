@@ -86,9 +86,9 @@ export default {
             const dummyId = `${DUMMY_PREFIX}${dummySeq++}`;
             graph.setNode(dummyId, { width: options.portRadius * 4, height: 0 });
             if (port.type === 'input') {
-              graph.setEdge(dummyId, node.id, { from: {}, to: {nodeId: node.id, portId: port.id }});
+              graph.setEdge(dummyId, node.id, { from: {}, to: { nodeId: node.id, portId: port.id } });
             } else {
-              graph.setEdge(node.id, dummyId, { from: { nodeId: node.id, portId: port.id }, to: {}});
+              graph.setEdge(node.id, dummyId, { from: { nodeId: node.id, portId: port.id }, to: {} });
             }
           }
         });
@@ -217,21 +217,25 @@ export default {
     },
 
     handlePortDrag (port, evt) {
-      this.dragPath = { 
+      this.dragPath = {
         ...this.dragPath,
         end: { x: evt.x, y: evt.y }
       };
     },
 
     handlePortDragEnd (port) {
-      this.portBeingDragged = null;
       this.dragCandidates = [];
       this.dragPath = emptyDragPath();
+      // clear on next tick to allow custom drop event to access source port
+      window.setTimeout(() => {
+        this.portBeingDragged = null;
+      }, 0);
     },
 
     handleDropTarget (port) {
-      console.log('port', this.portBeingDragged);
-      console.log('dragged to', port);
+      // here is where we tell the consumer what port was dropped onto another port
+      console.log('port', this.portBeingDragged.nodeId + ':' + this.portBeingDragged.portId);
+      console.log('dragged to', port.nodeId + ':' + port.portId);
     }
   },
   components: {
