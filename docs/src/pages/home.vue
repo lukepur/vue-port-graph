@@ -2,7 +2,7 @@
 <div>
   <h1>vue-port-graph</h1>
   <h3>Graph</h3>
-  <PortGraph :graphConfig="graphConfig" :onConnection="handleConnection" />
+  <PortGraph :graphConfig="graphConfig" :onPortConnection="handleConnection" />
   <h3>Config</h3>
   <pre>{{ JSON.stringify(graphConfig, null, 2).trim() }}</pre>
 </div>
@@ -10,6 +10,7 @@
 
 <script>
 import PortGraph from 'vue-port-graph';
+import { applyNewPortConnection } from '../../../src/helpers/graph-helpers';
 
 export default {
   name: 'home',
@@ -19,7 +20,7 @@ export default {
         nodes: [
           { id: 'input_node', ports: [ { id: 'input_one', type: 'output' }, { id: 'input_two', type: 'output' }, { id: 'input_three', type: 'output' } ] },
           { id: 'subprocess_one', ports: [ { id: 'arg_one', type: 'input' }, { id: 'arg_two', type: 'input' }, { id: 'output', type: 'output' } ] },
-          { id: 'subprocess_two', ports: [ { id: 'arg_one', type: 'input' }, { id: 'output', type: 'output' } ] }
+          { id: 'subprocess_two', ports: [ { id: 'arg_one', type: 'input' }, { id: 'arg_two', type: 'input' }, { id: 'output', type: 'output' } ] }
         ],
         edges: [
           { source: { nodeId: 'input_node', portId: 'input_one' }, target: { nodeId: 'subprocess_one', portId: 'arg_one' } },
@@ -32,11 +33,18 @@ export default {
           portRadius: 10,
           graphPadding: 20
         }
-      },
-      handleConnection: (con) => {
-        console.log('connection received:', con);
       }
     };
+  },
+  methods: {
+    handleConnection (con) {
+      console.log('connection received:', con);
+      console.log('this.graphConfig:', this.graphConfig);
+      // this.graphConfig = applyNewPortConnection(this.graphConfig, con);
+      const result = applyNewPortConnection(this.graphConfig, con);
+      this.graphConfig = result;
+      // return result;
+    }
   },
   components: {
     PortGraph

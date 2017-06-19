@@ -12,8 +12,7 @@
               :onPortDragStart="handlePortDragStart"
               :onPortDrag="handlePortDrag"
               :onPortDragEnd="handlePortDragEnd"
-              :onPortDropTarget="handleDropTarget"
-              :onConnection="onConnection" />
+              :onPortDropTarget="handleDropTarget" />
       </g>
     </svg>
   </div>
@@ -26,6 +25,8 @@ import { find, last, merge } from 'lodash';
 import Node from './node.vue';
 import Edge from './edge.vue';
 import Port from './port.vue';
+
+import { applyNewPortConnection, isGraphAcyclic } from '../helpers/graph-helpers';
 
 const DUMMY_PREFIX = 'dummy_';
 const DEFAULT_OPTS = {
@@ -54,7 +55,7 @@ export default {
       type: Object,
       default: () => ({ nodes: [], edges: [], options: {} })
     },
-    onConnection: {
+    onPortConnection: {
       type: Function,
       default: () => {}
     }
@@ -62,11 +63,12 @@ export default {
 
   computed: {
     graphOptions () {
-      let { options } = this.graphConfig;
+      const { options } = this.graphConfig;
       return merge({}, DEFAULT_OPTS, options);
     },
+
     layout () {
-      let { nodes, edges } = this.graphConfig;
+      const { nodes, edges } = this.graphConfig;
       const options = this.graphOptions;
 
       // init dagre graph
@@ -227,15 +229,25 @@ export default {
       this.dragCandidates = [];
       this.dragPath = emptyDragPath();
       // clear on next tick to allow custom drop event to access source port
-      window.setTimeout(() => {
+      this.$nextTick(() => {
         this.portBeingDragged = null;
-      }, 0);
+      });
     },
 
-    handleDropTarget (port) {
+    handleDropTarget (targetPort) {
       // here is where we tell the consumer what port was dropped onto another port
       console.log('port', this.portBeingDragged.nodeId + ':' + this.portBeingDragged.portId);
-      console.log('dragged to', port.nodeId + ':' + port.portId);
+      console.log('dragged to', targetPort.nodeId + ':' + targetPort.portId);
+      const connection = {
+        from: { ...this.portBeingDragged },
+        to: { ...targetPort }
+      };
+      // const newGraph = applyNewPortConnection(this.graphConfig, connection);
+      // console.log('old graph:', JSON.stringify(this.graphConfig.edges, null, 2));
+      // console.log('new graph', JSON.stringify(newGraph.edges, null, 2));
+      // console.log('isGraphAcyclic', isGraphAcyclic(newGraph));
+      this.onPortConnection(connection);
+      // return connection;
     }
   },
   components: {

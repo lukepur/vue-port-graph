@@ -45,10 +45,6 @@ export default {
     onPortDropTarget: {
       type: Function,
       default: () => {}
-    },
-    onConnection: {
-      type: Function,
-      default: () => {}
     }
   },
 
