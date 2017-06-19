@@ -15,7 +15,6 @@
   "dependencies": {
     "dagre": "^0.7.4",
     "lodash": "^4.17.4",
-    "vue": "^2.3.3",
     "vue-port-graph": "0.0.10",
     "vue-router": "^2.3.1"
   },
