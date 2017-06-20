@@ -56,6 +56,9 @@ export default {
     onPortConnection: {
       type: Function,
       default: () => {}
+    },
+    filterDropCandidates: {
+      type: Function
     }
   },
 
@@ -211,6 +214,11 @@ export default {
     handlePortDragStart (port) {
       this.portBeingDragged = { ...port };
       this.dragCandidates = this.ports.filter(p => p.type !== port.type && p.nodeId !== port.nodeId);
+      if (this.filterDropCandidates) {
+        this.dragCandidates = this.dragCandidates.filter(p => {
+          return this.filterDropCandidates(this.portBeingDragged, p);
+        });
+      }
       this.dragPath = {
         start: {...port.point}
       };

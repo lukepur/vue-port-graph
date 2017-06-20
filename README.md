@@ -56,6 +56,51 @@ export default {
 
 ```
 
+## Props
+
+### `graphConfig` (object)
+
+The configuration of the graph to render. Has the following shape:
+
+```
+{
+  nodes: [
+    { id: 'node_id', ports: [ { id: 'input_one', type: 'input' }, { id: 'output_one', type: 'output' } ] }
+    { id: 'node_2_id', ports: [ { id: 'input_one', type: 'input' }, { id: 'output_one', type: 'output' } ] }
+  ],
+  edges: [
+    { source: { nodeId: 'input_id', portId: 'output_one' }, target: { nodeId: 'node_2_id', portId: 'input_one' } },
+  ],
+  options: {
+    nodeWidth: 200,
+    nodeHeight: 40,
+    portRadius: 10,
+    graphPadding: 20
+  }
+}
+```
+
+### `onPortConnection` (function)
+
+The callback invoked when one port is dropped onto another port.
+
+The callback receives a `connection` object as the only parameter. `connection` has the following shape:
+
+```
+{
+  from: { nodeId, portId, type ('source' | 'target'), point { x, y } },
+  to: { nodeId, portId, type ('source' | 'target'), point { x, y } }
+}
+```
+
+This callback is only invoked if the dragged port can legally be connected to the dropped port (they are of opposite types, different nodes, and aren't excluded by the `filterDropCandidates` filter).
+
+### `filterDropCandidates` (function)
+
+An optional filter to apply to the droppable ports when a port drag is started.
+
+This callback receives 2 args: `portBeingDragged` and `candidatePort` and should return true to include the `candidatePort` as a legal drop target.
+
 ## Example
 
 Demo: [https://lukepur.github.io/vue-port-graph](https://lukepur.github.io/vue-port-graph)
