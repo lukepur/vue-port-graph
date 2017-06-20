@@ -1,8 +1,9 @@
 # vue-port-graph
 
 Graph a layout of nodes with ports. Supports drag and drop event handling for ports.
-
-![Port graph example](docs/static/graph.png?raw=true "Port graph example")
+<p align="center">
+  <img src="docs/static/graph.png?raw=true" alt="Port graph example" title="Port graph example"/>
+</p>
 
 ## Installation
 
