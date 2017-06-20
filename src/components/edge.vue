@@ -32,7 +32,7 @@ export default {
   fill: none;
 }
 
-.port-dragging .edge {
+.dragging .edge {
   stroke: #d3d3d3;
 }
 </style>

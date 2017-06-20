@@ -65,7 +65,7 @@ export default {
   methods: {
     handledrop () {
       if (this.mouseover && this.port.isCandidate) {
-        this.onPortDropTarget(this.port);
+        this.onPortDropTarget({ type: 'port', data : { ...this.port } });
       }
     },
 
@@ -85,7 +85,7 @@ export default {
         this.dragging = true;
       })
       .on('drag', () => {
-        this.onPortDrag(this.port, event)
+        this.onPortDrag(event)
       })
       .on('end', () => {
         this.onPortDragEnd(this.port);
@@ -111,15 +111,15 @@ export default {
   fill: #1c6fb9;
 }
 
-.port-dragging .port {
+.dragging .port {
   stroke: #d3d3d3;
 }
 
-.port-dragging .drag-candidate {
+.dragging .drag-candidate {
   stroke: #1c6fb9;
 }
 
-.port-dragging .drag-candidate.drag-target {
+.dragging .drag-candidate.drag-target {
   stroke: #63a263;
 }
 

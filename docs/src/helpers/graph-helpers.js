@@ -11,17 +11,17 @@ export const applyNewPortConnection = (graph, connection) => {
 
   // remove replaced edges
   let newEdges = edges.filter(e =>
-    !matchPort(e.source, connection.from) &&
-    !matchPort(e.source, connection.to) &&
-    !matchPort(e.target, connection.from) &&
-    !matchPort(e.target, connection.to));
+    !matchPort(e.source, connection.from.data) &&
+    !matchPort(e.source, connection.to.data) &&
+    !matchPort(e.target, connection.from.data) &&
+    !matchPort(e.target, connection.to.data));
 
   // add new edge
   newEdges = [
     ...newEdges,
     {
-      source: { nodeId: connection.from.nodeId, portId: connection.from.portId },
-      target: { nodeId: connection.to.nodeId, portId: connection.to.portId }
+      source: { nodeId: connection.from.data.nodeId, portId: connection.from.data.portId },
+      target: { nodeId: connection.to.data.nodeId, portId: connection.to.data.portId }
     }
   ];
 

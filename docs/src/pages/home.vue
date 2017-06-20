@@ -2,7 +2,7 @@
 <div>
   <h1>vue-port-graph</h1>
   <h3>Graph</h3>
-  <PortGraph :graphConfig="graphConfig" :onPortConnection="handleConnection" :filterDropCandidates="filterDropCandidates"/>
+  <PortGraph :graphConfig="graphConfig" :onConnection="handleConnection" :filterDropCandidates="filterDropCandidates"/>
   <h3>Config</h3>
   <pre>{{ JSON.stringify(graphConfig, null, 2).trim() }}</pre>
 </div>
@@ -18,9 +18,10 @@ export default {
     return {
       graphConfig: {
         nodes: [
-          { id: 'input_node', ports: [ { id: 'input_one', type: 'output' }, { id: 'input_two', type: 'output' }, { id: 'input_three', type: 'output' } ] },
+          { id: 'input_node', canCreateOutputPorts: true, ports: [ { id: 'input_one', type: 'output' }, { id: 'input_two', type: 'output' }, { id: 'input_three', type: 'output' } ] },
           { id: 'subprocess_one', ports: [ { id: 'arg_one', type: 'input' }, { id: 'arg_two', type: 'input' }, { id: 'output', type: 'output' } ] },
-          { id: 'subprocess_two', ports: [ { id: 'arg_one', type: 'input' }, { id: 'arg_two', type: 'input' }, { id: 'output', type: 'output' } ] }
+          { id: 'subprocess_two', ports: [ { id: 'arg_one', type: 'input' }, { id: 'arg_two', type: 'input' }, { id: 'output', type: 'output' } ] },
+          { id: 'sink', canCreateInputPorts: true, ports: [ { id: 'arg_one', type: 'input' }, { id: 'arg_two', type: 'input' }, { id: 'output', type: 'output' } ] }
         ],
         edges: [
           { source: { nodeId: 'input_node', portId: 'input_one' }, target: { nodeId: 'subprocess_one', portId: 'arg_one' } },

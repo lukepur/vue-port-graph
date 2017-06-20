@@ -1,18 +1,22 @@
 <template>
-  <div class="graph" :class="`${portDraggingClass}`">
+  <div class="graph" :class="`${draggingClass}`">
     <svg :width="layout.graph().width + (2 * padding)" :height="layout.graph().height + (2 * padding)">
       <g :transform="`translate(${padding}, ${padding})`">
-        <Node v-for="(node, index) in nodes" :node="node" :key="index" />
+        <Node v-for="(node, index) in nodes" :node="node" :key="index" 
+              :onNodeDragStart="handleNodeDragStart"
+              :onNodeDrag="handleDrag"
+              :onNodeDragEnd="handleDragEnd"
+              :onNodeDropTarget="handleDropTarget" />
         <Edge v-for="(edge, index) in edges" :edge="edge" :key="index" />
-        <path :d="dragPathAsSvg" class="drag-path" />
         <Port v-for="(port, index) in ports"
               :port="port"
               :radius="portRadius"
               :key="index"
               :onPortDragStart="handlePortDragStart"
-              :onPortDrag="handlePortDrag"
-              :onPortDragEnd="handlePortDragEnd"
+              :onPortDrag="handleDrag"
+              :onPortDragEnd="handleDragEnd"
               :onPortDropTarget="handleDropTarget" />
+        <path :d="dragPathAsSvg" class="drag-path" />
       </g>
     </svg>
   </div>
@@ -42,8 +46,9 @@ export default {
 
   data () {
     return {
-      portBeingDragged: null,
-      dragCandidates: [],
+      beingDragged: null,
+      portDropCandidates: [],
+      nodeDropCandidates: [],
       dragPath: emptyDragPath()
     };
   },
@@ -53,7 +58,7 @@ export default {
       type: Object,
       default: () => ({ nodes: [], edges: [], options: {} })
     },
-    onPortConnection: {
+    onConnection: {
       type: Function,
       default: () => {}
     },
@@ -81,7 +86,7 @@ export default {
 
       // add dagre nodes
       nodes.forEach(node => {
-        graph.setNode(node.id, { label: node.id, width: options.nodeWidth, height: options.nodeHeight });
+        graph.setNode(node.id, { label: node.id, width: options.nodeWidth, height: options.nodeHeight, ...node });
 
         // add dummy nodes for unconnected ports
         node.ports.forEach(port => {
@@ -113,11 +118,13 @@ export default {
 
     nodes () {
       return this.layout.nodes().map(n => ({
+        ...this.layout.node(n),
         x: this.nodeX(n),
         y: this.nodeY(n),
         width: this.layout.node(n).width,
         height: this.layout.node(n).height,
-        label: n
+        label: n,
+        isCandidate: this.isNodeCandidateId(n),
       }))
       .filter(n => n.label ? !this.isDummyLabel(n.label) : true);
     },
@@ -143,7 +150,7 @@ export default {
         if (!this.isDummyLabel(v)) {
           ports.push({
             ...e.from,
-            isCandidate: this.isCandidate(e.from),
+            isCandidate: this.isPortCandidate(e.from),
             point: this.layout.edge(edge).points[0],
             type: 'source'
           });
@@ -151,7 +158,7 @@ export default {
         if (!this.isDummyLabel(w)) {
           ports.push({
             ...e.to,
-            isCandidate: this.isCandidate(e.to),
+            isCandidate: this.isPortCandidate(e.to),
             point: last(this.layout.edge(edge).points),
             type: 'target'
           });
@@ -168,17 +175,19 @@ export default {
       return this.graphOptions.portRadius;
     },
 
-    portDraggingClass () {
-      return this.portBeingDragged ? 'port-dragging' : '';
+    draggingClass () {
+      return this.beingDragged ? 'dragging' : '';
     },
 
     dragPathAsSvg () {
       if (this.dragPath.start.x === null) return '';
+      const buffer = 3;
       const { start, end } = this.dragPath;
       let path = `M${start.x} ${start.y}`;
 
       if (end) {
-        path += ` L${end.x} ${end.y}`;
+        // give some buffer to the mouse cursor
+        path += ` L${end.x > start.x ? end.x - buffer : end.x + buffer} ${end.y > start.y ? end.y - buffer : end.y + buffer}`;
       }
 
       return path;
@@ -197,8 +206,14 @@ export default {
       return label && label.indexOf && label.indexOf('dummy_') > -1;
     },
 
-    isCandidate (port) {
-      return find(this.dragCandidates, { nodeId: port.nodeId, portId: port.portId }) !== undefined;
+    isPortCandidate (port) {
+      return find(this.portDropCandidates, { nodeId: port.nodeId, portId: port.portId }) !== undefined;
+    },
+
+    isNodeCandidateId (id) {
+      const result = find(this.nodeDropCandidates, { id }) !== undefined;
+      console.log('result:', result);
+      return result;
     },
 
     nodeX (n) {
@@ -212,11 +227,16 @@ export default {
     },
 
     handlePortDragStart (port) {
-      this.portBeingDragged = { ...port };
-      this.dragCandidates = this.ports.filter(p => p.type !== port.type && p.nodeId !== port.nodeId);
+      this.beingDragged = { type: 'port', data: { ...port } };
+      this.nodeDropCandidates = this.nodes.filter(n => {
+        return n[`canCreate${port.type === 'target' ? 'Output' : 'Input'}Ports`] &&
+          n.id !== port.nodeId;
+      });
+      console.log(this.nodeDropCandidates.length);
+      this.portDropCandidates = this.ports.filter(p => p.type !== port.type && p.nodeId !== port.nodeId);
       if (this.filterDropCandidates) {
-        this.dragCandidates = this.dragCandidates.filter(p => {
-          return this.filterDropCandidates(this.portBeingDragged, p);
+        this.portDropCandidates = this.portDropCandidates.filter(p => {
+          return this.filterDropCandidates(this.beingDragged, p);
         });
       }
       this.dragPath = {
@@ -224,29 +244,49 @@ export default {
       };
     },
 
-    handlePortDrag (port, evt) {
+    handleNodeDragStart (node) {
+      this.beingDragged = { type: 'node', data: { ...node } };
+      if (!node.canCreateOutputPorts) return;
+      this.nodeDropCandidates = this.nodes.filter(n => {
+        return n.canCreateInputPorts &&
+          n.id !== node.id;
+      });
+      console.log(this.nodeDropCandidates.length);
+      this.portDropCandidates = this.ports.filter(p => p.type === 'target' && p.nodeId !== node.id);
+      if (this.filterDropCandidates) {
+        this.portDropCandidates = this.portDropCandidates.filter(p => {
+          return this.filterDropCandidates(this.beingDragged, p);
+        });
+      }
+      this.dragPath = {
+        start: { x: node.x + this.graphOptions.nodeWidth / 2, y: node.y + this.graphOptions.nodeHeight / 2 }
+      };
+    },
+    handleDrag (evt) {
       this.dragPath = {
         ...this.dragPath,
         end: { x: evt.x, y: evt.y }
       };
     },
 
-    handlePortDragEnd (port) {
-      this.dragCandidates = [];
+    handleDragEnd () {
+      this.portDropCandidates = [];
+      this.nodeDropCandidates = [];
       this.dragPath = emptyDragPath();
       // clear on next tick to allow custom drop event to access source port
       this.$nextTick(() => {
-        this.portBeingDragged = null;
+        this.beingDragged = null;
       });
     },
 
-    handleDropTarget (targetPort) {
+    handleDropTarget (target) {
       // here is where we tell the consumer what port was dropped onto another port
       const connection = {
-        from: { ...this.portBeingDragged },
-        to: { ...targetPort }
+        from: { ...this.beingDragged },
+        to: { ...target }
       };
-      this.onPortConnection(connection);
+      console.log('emitting connection:', connection);
+      this.onConnection(connection);
     }
   },
   components: {
