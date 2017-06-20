@@ -72,7 +72,7 @@ export default {
       const options = this.graphOptions;
 
       // init dagre graph
-      const graph = new dagre.graphlib.Graph();
+      const graph = new dagre.graphlib.Graph({ multigraph: true});
       graph.setGraph(options.dagre);
       graph.setDefaultEdgeLabel(() => ({}));
 
@@ -101,7 +101,7 @@ export default {
         graph.setEdge(edge.source.nodeId, edge.target.nodeId, {
           from: { ...edge.source },
           to: { ...edge.target }
-        });
+        }, `${edge.source.nodeId}:${edge.source.portId}->${edge.target.nodeId}:${edge.target.portId}`)
       });
 
       // run layout
