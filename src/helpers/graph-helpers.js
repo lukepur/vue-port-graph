@@ -1,5 +1,5 @@
-import { find, cloneDeep, assign } from 'lodash';
-import dagre from 'dagre';
+import { cloneDeep, assign } from 'lodash';
+import toposort from 'toposort';
 
 const matchPort = (source, target) => {
   return source.nodeId === target.nodeId && source.portId === target.portId;
@@ -7,10 +7,10 @@ const matchPort = (source, target) => {
 
 export const applyNewPortConnection = (graph, connection) => {
   const result = cloneDeep(graph);
-  const { nodes, edges } = result;
+  const { edges } = result;
 
   // remove replaced edges
-  let newEdges = edges.filter(e => 
+  let newEdges = edges.filter(e =>
     !matchPort(e.source, connection.from) &&
     !matchPort(e.source, connection.to) &&
     !matchPort(e.target, connection.from) &&
@@ -31,20 +31,14 @@ export const applyNewPortConnection = (graph, connection) => {
 };
 
 export const isGraphAcyclic = graphConfig => {
-  const graph = new dagre.graphlib.Graph();
-  const { nodes, edges } = graphConfig;
-  graph.setGraph({});
-  graph.setDefaultEdgeLabel(() => ({}));
-  nodes.forEach(n => {
-    graph.setNode(n.id);
-  });
-  edges.forEach(e => {
-    graph.setEdge(e.source.nodeId, e.target.nodeId);
-  });
-
-  const result = dagre.layout(graph);
-
-  console.log('isDirected:',graph.isDirected());
-
-  return graph;
+  const { edges } = graphConfig;
+  const deps = edges.map(edge => [edge.source.nodeId, edge.target.nodeId]);
+  let isAcyclic;
+  try {
+    toposort(deps);
+    isAcyclic = true;
+  } catch (e) {
+    isAcyclic = false;
+  }
+  return isAcyclic;
 };

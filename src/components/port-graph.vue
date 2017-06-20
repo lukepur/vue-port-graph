@@ -236,18 +236,11 @@ export default {
 
     handleDropTarget (targetPort) {
       // here is where we tell the consumer what port was dropped onto another port
-      console.log('port', this.portBeingDragged.nodeId + ':' + this.portBeingDragged.portId);
-      console.log('dragged to', targetPort.nodeId + ':' + targetPort.portId);
       const connection = {
         from: { ...this.portBeingDragged },
         to: { ...targetPort }
       };
-      // const newGraph = applyNewPortConnection(this.graphConfig, connection);
-      // console.log('old graph:', JSON.stringify(this.graphConfig.edges, null, 2));
-      // console.log('new graph', JSON.stringify(newGraph.edges, null, 2));
-      // console.log('isGraphAcyclic', isGraphAcyclic(newGraph));
       this.onPortConnection(connection);
-      // return connection;
     }
   },
   components: {
