@@ -26,8 +26,6 @@ import Node from './node.vue';
 import Edge from './edge.vue';
 import Port from './port.vue';
 
-import { applyNewPortConnection, isGraphAcyclic } from '../helpers/graph-helpers';
-
 const DUMMY_PREFIX = 'dummy_';
 const DEFAULT_OPTS = {
   nodeWidth: 200,
@@ -72,7 +70,7 @@ export default {
       const options = this.graphOptions;
 
       // init dagre graph
-      const graph = new dagre.graphlib.Graph({ multigraph: true});
+      const graph = new dagre.graphlib.Graph({ multigraph: true });
       graph.setGraph(options.dagre);
       graph.setDefaultEdgeLabel(() => ({}));
 
