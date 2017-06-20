@@ -1,7 +1,8 @@
 <template>
 <g @xdrop="handledrop"
    @mouseenter="handlemouseenter"
-   @mouseleave="handlemouseleave">
+   @mouseleave="handlemouseleave"
+   class="node">
   <rect :x="node.x" :y="node.y"
         rx="5" ry="5"
         :width="node.width"
@@ -92,6 +93,8 @@ export default {
         this.dragging = false;
         // dispatch drop event to target
         const { sourceEvent } = event;
+        // TODO: fix this, it feels wrong:
+        sourceEvent.path[0].dispatchEvent(new Event('xdrop'));
         sourceEvent.path[1].dispatchEvent(new Event('xdrop'));
       })
     select(this.$el)
@@ -101,20 +104,25 @@ export default {
 </script>
 
 <style>
-.node {
+.node rect {
   stroke: #7a93a9;
   stroke-width: 4;
   fill: #fff;
 }
-.dragging .node {
+
+.node text {
+  cursor: default;
+}
+
+.dragging .node rect {
   stroke: #d3d3d3;
 }
 
-.dragging .drag-candidate {
+.dragging rect.drag-candidate {
   stroke: #1c6fb9;
 }
 
-.dragging .drag-candidate.drag-target {
+.dragging rect.drag-candidate.drag-target {
   stroke: #63a263;
 }
 </style>

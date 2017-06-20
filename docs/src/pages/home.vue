@@ -10,7 +10,7 @@
 
 <script>
 import PortGraph from 'vue-port-graph';
-import { applyNewPortConnection, isGraphAcyclic } from '../helpers/graph-helpers';
+import { applyNewConnection, isGraphAcyclic } from '../helpers/graph-helpers';
 
 export default {
   name: 'home',
@@ -39,7 +39,8 @@ export default {
   },
   methods: {
     handleConnection (con) {
-      const result = applyNewPortConnection(this.graphConfig, con);
+      console.log(JSON.stringify(con));
+      const result = applyNewConnection(this.graphConfig, con);
       if (isGraphAcyclic(result)) this.graphConfig = result;
     },
     filterDropCandidates (portBeingDragged, candidate) {
