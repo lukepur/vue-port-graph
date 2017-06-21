@@ -1,7 +1,7 @@
 {
   "name": "vue-port-graph",
   "description": "Graph a layout of nodes with ports",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "author": {
     "name": "Luke Purton",
     "email": "luke.purton@gmail.com"

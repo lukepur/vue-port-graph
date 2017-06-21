@@ -95,6 +95,17 @@ The callback receives a `connection` object as the only parameter. `connection` 
 
 This callback is only invoked if the dragged node or port can legally be connected to the dropped node or port (they are of opposite types, different nodes, and aren't excluded by the `filterDropCandidates` filter).
 
+### `onEntityClick` (function)
+
+Callback invoked when a node or port is clicked (not dragged). The callback is invoked with an object representing the node or port clicked:
+
+```
+{
+  type: 'node'|'port',
+  data: Object
+}
+```
+
 ### `filterDropCandidates` (function)
 
 An optional filter to apply to the droppable ports when a port drag is started.
