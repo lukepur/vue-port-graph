@@ -2,7 +2,7 @@
 <g :transform="`translate(${origin.x},${origin.y})`">
   <polygon class="port"
            :points="svgPoints"
-           :transform="`rotate(${portDirection}, ${-originModifiers.x}, ${-originModifiers.y})`"
+           :transform="`rotate(${portDirection})${mouseoverTransform}`"
            :class="`${dragClass} ${dragCandidateClass} ${dragTargetClass}`"
            @xdrop="handledrop"
            @mouseenter="handlemouseenter"
@@ -68,6 +68,7 @@ export default {
         y: -(radius * 0.3)
       };
     },
+
     origin () {
       const { x, y } = this.port.point;
       return { x: x + this.originModifiers.x, y: y + this.originModifiers.y };
@@ -87,6 +88,13 @@ export default {
         return Math.atan2(port.point.y - port.previousPoint.y, port.point.x - port.previousPoint.x) * 180 / Math.PI - 90;
       }
       return 0;
+    },
+
+    mouseoverTransform () {
+      if (this.mouseover) {
+        return ' scale(1.5)';
+      }
+      return '';
     }
   },
 
@@ -133,6 +141,7 @@ export default {
   fill: #fff;
   stroke: #7a93a9;
   stroke-width: 2;
+  transform-origin: center;
 }
 
 .dragging {
