@@ -38,12 +38,16 @@ const applyNewPortToPortConnection = (graph, connection) => {
     !matchPort(e.target, connection.from.data) &&
     !matchPort(e.target, connection.to.data));
 
+  // ensure source is output and target is input
+  const source = connection.from.data.type === 'source' ? connection.from : connection.to;
+  const target = connection.from.data.type === 'target' ? connection.from : connection.to;
+
   // add new edge
   newEdges = [
     ...newEdges,
     {
-      source: { nodeId: connection.from.data.nodeId, portId: connection.from.data.portId },
-      target: { nodeId: connection.to.data.nodeId, portId: connection.to.data.portId }
+      source: { nodeId: source.data.nodeId, portId: source.data.portId },
+      target: { nodeId: target.data.nodeId, portId: target.data.portId }
     }
   ];
 
@@ -90,20 +94,21 @@ const applyNewNodeToNodeConnection = (graph, connection) => {
 const applyNewNodeToPortConnection = (graph, connection) => {
   // add an output port to from node and apply new port connection
   const result = cloneDeep(graph);
+  const targetPortType = (connection.to.data.type === 'target' ? 'output' : 'input');
   const { nodes } = result;
   const fromNode = find(nodes, { id: connection.from.data.id });
-  const fromPortId = `output_${fromNode.ports.filter(p => p.type === 'output').length + 1}`;
+  const fromPortId = `${targetPortType}_${fromNode.ports.filter(p => p.type === targetPortType).length + 1}`;
   fromNode.ports = [
     ...fromNode.ports,
     {
       id: fromPortId,
-      type: 'output'
+      type: targetPortType
     }
   ];
   const portConnection = {
     from: {
       type: 'port',
-      data: { nodeId: fromNode.id, portId: fromPortId }
+      data: { nodeId: fromNode.id, portId: fromPortId, type: targetPortType === 'output' ? 'source' : 'target' }
     },
     to: connection.to
   };
@@ -111,23 +116,24 @@ const applyNewNodeToPortConnection = (graph, connection) => {
 };
 
 const applyNewPortToNodeConnection = (graph, connection) => {
-  // add an input port to to node and apply new port connection
+  // add a target port to to node and apply new port connection
   const result = cloneDeep(graph);
   const { nodes } = result;
   const toNode = find(nodes, { id: connection.to.data.id });
-  const toPortId = `output_${toNode.ports.filter(p => p.type === 'input').length + 1}`;
+  const targetPortType = (connection.from.data.type === 'target' ? 'output' : 'input');
+  const toPortId = `${targetPortType}_${toNode.ports.filter(p => p.type === targetPortType).length + 1}`;
   toNode.ports = [
     ...toNode.ports,
     {
       id: toPortId,
-      type: 'input'
+      type: targetPortType
     }
   ];
   const portConnection = {
     from: connection.from,
     to: {
       type: 'port',
-      data: { nodeId: toNode.id, portId: toPortId }
+      data: { nodeId: toNode.id, portId: toPortId, type: targetPortType === 'output' ? 'source' : 'target' }
     }
   };
   return applyNewPortToPortConnection(result, portConnection);
@@ -141,6 +147,7 @@ export const isGraphAcyclic = graphConfig => {
     toposort(deps);
     isAcyclic = true;
   } catch (e) {
+    console.log('graph is cyclic');
     isAcyclic = false;
   }
   return isAcyclic;

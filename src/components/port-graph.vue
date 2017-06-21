@@ -212,7 +212,6 @@ export default {
 
     isNodeCandidateId (id) {
       const result = find(this.nodeDropCandidates, { id }) !== undefined;
-      console.log('result:', result);
       return result;
     },
 
@@ -232,7 +231,6 @@ export default {
         return n[`canCreate${port.type === 'target' ? 'Output' : 'Input'}Ports`] &&
           n.id !== port.nodeId;
       });
-      console.log(this.nodeDropCandidates.length);
       this.portDropCandidates = this.ports.filter(p => p.type !== port.type && p.nodeId !== port.nodeId);
       if (this.filterDropCandidates) {
         this.portDropCandidates = this.portDropCandidates.filter(p => {
@@ -251,7 +249,6 @@ export default {
         return n.canCreateInputPorts &&
           n.id !== node.id;
       });
-      console.log(this.nodeDropCandidates.length);
       this.portDropCandidates = this.ports.filter(p => p.type === 'target' && p.nodeId !== node.id);
       if (this.filterDropCandidates) {
         this.portDropCandidates = this.portDropCandidates.filter(p => {
@@ -285,7 +282,6 @@ export default {
         from: { ...this.beingDragged },
         to: { ...target }
       };
-      console.log('emitting connection:', connection);
       this.onConnection(connection);
     }
   },

@@ -39,7 +39,6 @@ export default {
   },
   methods: {
     handleConnection (con) {
-      console.log(JSON.stringify(con));
       const result = applyNewConnection(this.graphConfig, con);
       if (isGraphAcyclic(result)) this.graphConfig = result;
     },
