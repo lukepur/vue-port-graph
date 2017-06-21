@@ -65,7 +65,7 @@ export default {
   methods: {
     handledrop () {
       if (this.mouseover && this.port.isCandidate) {
-        this.onPortDropTarget({ type: 'port', data : { ...this.port } });
+        this.onPortDropTarget({ type: 'port', data: { ...this.port } });
       }
     },
 

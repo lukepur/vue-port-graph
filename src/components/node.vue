@@ -54,7 +54,7 @@ export default {
   },
 
   computed: {
-    dragCandidateClass() {
+    dragCandidateClass () {
       return this.node.isCandidate ? 'drag-candidate' : '';
     },
 

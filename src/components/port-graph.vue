@@ -124,7 +124,7 @@ export default {
         width: this.layout.node(n).width,
         height: this.layout.node(n).height,
         label: n,
-        isCandidate: this.isNodeCandidateId(n),
+        isCandidate: this.isNodeCandidateId(n)
       }))
       .filter(n => n.label ? !this.isDummyLabel(n.label) : true);
     },
