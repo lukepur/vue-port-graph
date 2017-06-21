@@ -70,16 +70,12 @@ export default {
     },
     origin () {
       const { x, y } = this.port.point;
-      const { radius } = this;
       return { x: x + this.originModifiers.x, y: y + this.originModifiers.y };
-      // return `${x-half},${y-half} ${x+2*half},${y-half} ${x+half},${y+2*half}`;
     },
 
     svgPoints () {
-      const { x, y } = this.port.point;
       const r = this.radius;
-
-      return `0,0 ${r*2},0 ${r},${r*1.1}`;
+      return `0,0 ${r * 2},0 ${r},${r * 1.1}`;
     },
 
     portDirection () {
