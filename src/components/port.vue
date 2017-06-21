@@ -92,9 +92,7 @@ export default {
         this.dragging = false;
         // dispatch drop event to target
         const { sourceEvent } = event;
-        // TODO: fix this, it feels wrong:
-        sourceEvent.path[0].dispatchEvent(new Event('xdrop'));
-        sourceEvent.path[1].dispatchEvent(new Event('xdrop'));
+        sourceEvent.path[0].dispatchEvent(new Event('xdrop', { bubbles: true }));
       })
     select(this.$el)
       .call(dragBehaviour);
