@@ -28,7 +28,7 @@ export default {
 <style>
 .edge {
   stroke: #e67200;
-  stroke-width: 3;
+  stroke-width: 1;
   fill: none;
 }
 

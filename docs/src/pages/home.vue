@@ -31,7 +31,7 @@ export default {
         options: {
           nodeWidth: 200,
           nodeHeight: 40,
-          portRadius: 10,
+          portRadius: 8,
           graphPadding: 20
         }
       }

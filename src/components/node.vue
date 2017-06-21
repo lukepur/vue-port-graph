@@ -104,7 +104,7 @@ export default {
 <style>
 .node rect {
   stroke: #7a93a9;
-  stroke-width: 4;
+  stroke-width: 2;
   fill: #fff;
 }
 

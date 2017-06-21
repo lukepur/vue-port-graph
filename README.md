@@ -65,8 +65,8 @@ The configuration of the graph to render. Has the following shape:
 ```
 {
   nodes: [
-    { id: 'node_id', ports: [ { id: 'input_one', type: 'input' }, { id: 'output_one', type: 'output' } ] }
-    { id: 'node_2_id', ports: [ { id: 'input_one', type: 'input' }, { id: 'output_one', type: 'output' } ] }
+    { id: 'node_id', canCreateOutputPorts: true, ports: [ { id: 'input_one', type: 'input' }, { id: 'output_one', type: 'output' } ] }
+    { id: 'node_2_id', canCreateInputPorts: true, ports: [ { id: 'input_one', type: 'input' }, { id: 'output_one', type: 'output' } ] }
   ],
   edges: [
     { source: { nodeId: 'input_id', portId: 'output_one' }, target: { nodeId: 'node_2_id', portId: 'input_one' } },
@@ -80,20 +80,20 @@ The configuration of the graph to render. Has the following shape:
 }
 ```
 
-### `onPortConnection` (function)
+### `onConnection` (function)
 
-The callback invoked when one port is dropped onto another port.
+The callback invoked when one node or port is dropped onto another node or port.
 
 The callback receives a `connection` object as the only parameter. `connection` has the following shape:
 
 ```
 {
-  from: { nodeId, portId, type ('source' | 'target'), point { x, y } },
-  to: { nodeId, portId, type ('source' | 'target'), point { x, y } }
+  from: { type: 'node|port', data: { nodeId, portId, type ('source' | 'target'), point { x, y } } },
+  to: { type: 'node|port', data: { nodeId, portId, type ('source' | 'target'), point { x, y } } }
 }
 ```
 
-This callback is only invoked if the dragged port can legally be connected to the dropped port (they are of opposite types, different nodes, and aren't excluded by the `filterDropCandidates` filter).
+This callback is only invoked if the dragged node or port can legally be connected to the dropped node or port (they are of opposite types, different nodes, and aren't excluded by the `filterDropCandidates` filter).
 
 ### `filterDropCandidates` (function)
 

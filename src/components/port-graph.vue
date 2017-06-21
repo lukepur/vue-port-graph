@@ -37,7 +37,7 @@ const DEFAULT_OPTS = {
   portRadius: 10,
   graphPadding: 20,
   dagre: {
-    nodesep: 2 * 10
+    nodesep: 4 * 10
   }
 };
 
@@ -152,6 +152,7 @@ export default {
             ...e.from,
             isCandidate: this.isPortCandidate(e.from),
             point: this.layout.edge(edge).points[0],
+            nextPoint: !this.isDummyLabel(w) ? this.layout.edge(edge).points[1] : null,
             type: 'source'
           });
         }
@@ -160,6 +161,7 @@ export default {
             ...e.to,
             isCandidate: this.isPortCandidate(e.to),
             point: last(this.layout.edge(edge).points),
+            previousPoint: !this.isDummyLabel(v) ? this.layout.edge(edge).points[this.layout.edge(edge).points.length - 2] : null,
             type: 'target'
           });
         }

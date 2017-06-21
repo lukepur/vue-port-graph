@@ -1,13 +1,13 @@
 <template>
-  <circle :cx="port.point.x"
-          :cy="port.point.y"
-          :r="radius"
-          class="port"
-          :class="`${dragClass} ${dragCandidateClass} ${dragTargetClass}`"
-          @xdrop="handledrop"
-          @mouseenter="handlemouseenter"
-          @mouseleave="handlemouseleave" />
-  </circle>
+<g :transform="`translate(${origin.x},${origin.y})`">
+  <polygon class="port"
+           :points="svgPoints"
+           :transform="`rotate(${portDirection}, ${-originModifiers.x}, ${-originModifiers.y})`"
+           :class="`${dragClass} ${dragCandidateClass} ${dragTargetClass}`"
+           @xdrop="handledrop"
+           @mouseenter="handlemouseenter"
+           @mouseleave="handlemouseleave" />
+</g>
 </template>
 
 <script>
@@ -27,7 +27,7 @@ export default {
   props: {
     port: {
       type: Object,
-      default: () => ({ isCandidate: false })
+      default: () => ({ isCandidate: false, point: {} })
     }, // { target: 'path', type: 'source|target', point: {x, y}}
     radius: Number,
     onPortDragStart: {
@@ -59,6 +59,38 @@ export default {
 
     dragTargetClass () {
       return this.mouseover && this.port.isCandidate ? 'drag-target' : '';
+    },
+
+    originModifiers () {
+      const { radius } = this;
+      return {
+        x: -radius,
+        y: -(radius * 0.3)
+      };
+    },
+    origin () {
+      const { x, y } = this.port.point;
+      const { radius } = this;
+      return { x: x + this.originModifiers.x, y: y + this.originModifiers.y };
+      // return `${x-half},${y-half} ${x+2*half},${y-half} ${x+half},${y+2*half}`;
+    },
+
+    svgPoints () {
+      const { x, y } = this.port.point;
+      const r = this.radius;
+
+      return `0,0 ${r*2},0 ${r},${r*1.1}`;
+    },
+
+    portDirection () {
+      const { port } = this;
+      if (port.nextPoint) {
+        return Math.atan2(port.nextPoint.y - port.point.y, port.nextPoint.x - port.point.x) * 180 / Math.PI - 90;
+      }
+      if (port.previousPoint) {
+        return Math.atan2(port.point.y - port.previousPoint.y, port.point.x - port.previousPoint.x) * 180 / Math.PI - 90;
+      }
+      return 0;
     }
   },
 
@@ -104,7 +136,7 @@ export default {
 .port {
   fill: #fff;
   stroke: #7a93a9;
-  stroke-width: 3;
+  stroke-width: 2;
 }
 
 .dragging {
