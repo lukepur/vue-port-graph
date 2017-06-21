@@ -2,7 +2,11 @@
 <div>
   <h1>vue-port-graph</h1>
   <h3>Graph</h3>
-  <PortGraph :graphConfig="graphConfig" :onConnection="handleConnection" :filterDropCandidates="filterDropCandidates"/>
+  <PortGraph
+    :graphConfig="graphConfig"
+    :onConnection="handleConnection"
+    :filterDropCandidates="filterDropCandidates"
+    :onEntityClick="handleEntityClick" />
   <h3>Config</h3>
   <pre>{{ JSON.stringify(graphConfig, null, 2).trim() }}</pre>
 </div>
@@ -45,6 +49,9 @@ export default {
     filterDropCandidates (portBeingDragged, candidate) {
       // return Math.random() > 0.5;
       return true;
+    },
+    handleEntityClick (entity) {
+      console.log('entity', entity);
     }
   },
   components: {

@@ -2,6 +2,7 @@
 <g @xdrop="handledrop"
    @mouseenter="handlemouseenter"
    @mouseleave="handlemouseleave"
+   @click="onNodeClick({type: 'node', data: node})"
    class="node">
   <rect :x="node.x" :y="node.y"
         rx="5" ry="5"
@@ -41,6 +42,10 @@ export default {
       default: () => {}
     },
     onNodeDropTarget: {
+      type: Function,
+      default: () => {}
+    },
+    onNodeClick: {
       type: Function,
       default: () => {}
     }

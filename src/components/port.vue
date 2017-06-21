@@ -1,5 +1,6 @@
 <template>
-<g :transform="`translate(${origin.x},${origin.y})`">
+<g :transform="`translate(${origin.x},${origin.y})`"
+   @click="onPortClick({type: 'port', data: port})">
   <polygon class="port"
            :points="svgPoints"
            :transform="`rotate(${portDirection})${mouseoverTransform}`"
@@ -43,6 +44,10 @@ export default {
       default: () => {}
     },
     onPortDropTarget: {
+      type: Function,
+      default: () => {}
+    },
+    onPortClick: {
       type: Function,
       default: () => {}
     }

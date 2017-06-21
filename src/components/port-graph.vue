@@ -6,7 +6,8 @@
               :onNodeDragStart="handleNodeDragStart"
               :onNodeDrag="handleDrag"
               :onNodeDragEnd="handleDragEnd"
-              :onNodeDropTarget="handleDropTarget" />
+              :onNodeDropTarget="handleDropTarget"
+              :onNodeClick="onEntityClick"   />
         <Edge v-for="(edge, index) in edges" :edge="edge" :key="index" />
         <Port v-for="(port, index) in ports"
               :port="port"
@@ -15,7 +16,8 @@
               :onPortDragStart="handlePortDragStart"
               :onPortDrag="handleDrag"
               :onPortDragEnd="handleDragEnd"
-              :onPortDropTarget="handleDropTarget" />
+              :onPortDropTarget="handleDropTarget"
+              :onPortClick="onEntityClick"/>
         <path :d="dragPathAsSvg" class="drag-path" />
       </g>
     </svg>
@@ -59,6 +61,10 @@ export default {
       default: () => ({ nodes: [], edges: [], options: {} })
     },
     onConnection: {
+      type: Function,
+      default: () => {}
+    },
+    onEntityClick: {
       type: Function,
       default: () => {}
     },
